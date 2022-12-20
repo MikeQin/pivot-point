@@ -1,9 +1,9 @@
 import yfinance as yf
 import streamlit as st
 import pandas as pd
-import altair as alt
-from vega_datasets import data
-import re
+# import altair as alt
+# from vega_datasets import data
+# import re
 # import plotly.graph_objects as go
 # import math
 
@@ -29,8 +29,8 @@ if ticker == '^GSPC':
 else:
   st.title(ticker + ' 0DT Price Range')
 
-data = yf.Ticker(ticker)
-ticker_df = data.history(period='1d', interval='1m')
+f_data = yf.Ticker(ticker)
+ticker_df = f_data.history(period='1d', interval='1m')
 print(ticker_df)
 ticker_open = ticker_df.Open[0]
 ticker_high = ticker_df.High.max()
@@ -137,7 +137,7 @@ st.table(cpr_df)
 # )
 
 # Long period
-df_1y = data.history(period='1y', interval='1d')
+df_1y = f_data.history(period='1y', interval='1d')
 
 # Candlestick Chart
 # fig = go.Figure(data=[go.Candlestick(x=df_1y.index,
