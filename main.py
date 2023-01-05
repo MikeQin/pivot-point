@@ -31,17 +31,29 @@ else:
 
 f_data = yf.Ticker(ticker)
 ticker_df = f_data.history(period='1d', interval='1m')
-print(ticker_df)
+# print(ticker_df)
 ticker_open = ticker_df.Open[0]
 ticker_high = ticker_df.High.max()
+ticker_high_vol = ticker_df.Volume.max()
 ticker_low = ticker_df.Low.min()
 ticker_close = ticker_df.Close[-1]
 close_price = str("{:,.2f}".format(ticker_close))
 # print(ticker_open, ticker_high, ticker_low, ticker_close)
+def get_high_vol_close(df, high_vol):
+  hv_df = df.where(df.Volume >= high_vol)
+  close = hv_df.Close.max()
+  return close
+
+high_close = get_high_vol_close(ticker_df, ticker_high_vol)
+
+# print('ticker_high_vol', ticker_high_vol)
+# print('high_close', high_close)
 
 st.text('Data date: ' + str(ticker_df.index[-1]))
 
 st.subheader('Spot Price: $' + close_price)
+poc = '<p style="font-family:sans-serif; color:Green;">POC: ' + str("{:,.2f}".format(high_close)) + ', Vol: ' + str("{:,.0f}".format(ticker_high_vol)) + '</p>'
+st.write(poc, unsafe_allow_html=True)
 
 # https://tradingfuel.com/pivot-point-calculator-and-strategy/
 # https://www.pivotpointcalculator.com/
@@ -102,6 +114,10 @@ st.table(df4)
 # st.bar_chart(df)
 
 # Central Pivot Range
+# Pivot point = (High + Low + Close) / 3
+# Top Central Pivot Point (BC) = (Pivot – BC) + Pivot
+# Bottom Central Pivot Point (TC) = (High + Low) / 2
+
 def calc_cpr(high, low, close):
   pp = (high + low + close)/3
   # BC: Bottom Central
@@ -110,9 +126,11 @@ def calc_cpr(high, low, close):
   # TC: Top Central
   # Upper boundary
   tc = (pp - bc) + pp
+  
   cpr = {
-    'Top Central (upper bound)': [str("{:,.2f}".format(tc))],
-    'Bottom Central (lower bound)': [str("{:,.2f}".format(bc))]
+    'Top PP': [str("{:,.2f}".format(tc))],
+    'Middle PP': [str("{:,.2f}".format(pp))],
+    'Bottom PP': [str("{:,.2f}".format(bc))]
   }
   return cpr
 
@@ -122,6 +140,7 @@ cpr_df = pd.DataFrame(cpr_dict)
 # Display dataframe table
 st.markdown('##### Central Pivot Range (CPR)')
 st.table(cpr_df)
+st.bar_chart(cpr_df)
 
 # Line Chart
 # st.line_chart(ticker_df.Close)
@@ -183,6 +202,10 @@ atr = calc_atr(df_1y, num)
 # print('atr', atr)
 st.subheader('ATR (' + str(num) +'-day period): ' + str(atr))
 
+st.subheader('1 Day Volume Chart')
+st.line_chart(ticker_df.Volume)
+
 # Print Charts
-st.line_chart(df_1y.Close)
-st.bar_chart(df_1y.Volume)
+# st.line_chart(df_1y.Close)
+# st.subheader('Volume Chart')
+# st.line_chart(df_1y.Volume)
