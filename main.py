@@ -32,28 +32,42 @@ else:
 f_data = yf.Ticker(ticker)
 ticker_df = f_data.history(period='1d', interval='1m')
 # print(ticker_df)
+# print(ticker_df.info())
+
 ticker_open = ticker_df.Open[0]
 ticker_high = ticker_df.High.max()
-ticker_high_vol = ticker_df.Volume.max()
 ticker_low = ticker_df.Low.min()
 ticker_close = ticker_df.Close[-1]
 close_price = str("{:,.2f}".format(ticker_close))
 # print(ticker_open, ticker_high, ticker_low, ticker_close)
-def get_high_vol_close(df, high_vol):
-  hv_df = df.where(df.Volume >= high_vol)
-  close = hv_df.Close.max()
-  return close
 
-high_close = get_high_vol_close(ticker_df, ticker_high_vol)
+def vol_profile(df):
+  agg_df = df.copy()
+  agg_df = agg_df.drop(['Open', 'High', 'Low', 'Dividends', 'Stock Splits'], axis=1)
+  agg_df['Close'] = agg_df['Close'].astype(int)
+  agg_df = agg_df.groupby('Close').sum().reset_index()
+  agg_df = agg_df.sort_values(by=['Volume'], ascending=False)
+  agg_df = agg_df.set_index('Close')
+  # print(agg_df.head(20))
+  return agg_df.head(20)
 
-# print('ticker_high_vol', ticker_high_vol)
-# print('high_close', high_close)
+# def get_high_vol_close(df, high_vol):
+#   hv_df = df.where(df.Volume >= high_vol)
+#   close = hv_df.Close.max()
+#   return close
 
 st.text('Data date: ' + str(ticker_df.index[-1]))
 
 st.subheader('Spot Price: $' + close_price)
-poc = '<p style="font-family:sans-serif; color:Green;">POC: ' + str("{:,.2f}".format(high_close)) + ', Vol: ' + str("{:,.0f}".format(ticker_high_vol)) + '</p>'
-st.write(poc, unsafe_allow_html=True)
+
+vol_prof_df = vol_profile(ticker_df)
+poc = vol_prof_df.head(1).index.to_numpy()[0]
+poc_vol = vol_prof_df.head(1).Volume.to_numpy()[0]
+# print(poc, poc_vol)
+poc_html = '<p style="font-family:sans-serif; color:Red;">POC: ' + str("{:,.0f}".format(poc)) + ', Vol: ' + str("{:,.0f}".format(poc_vol)) + '</p>'
+
+st.write(poc_html, unsafe_allow_html=True)
+st.bar_chart(vol_prof_df)
 
 # https://tradingfuel.com/pivot-point-calculator-and-strategy/
 # https://www.pivotpointcalculator.com/
