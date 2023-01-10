@@ -25,9 +25,9 @@ if user_ticker:
 
 # Main section
 if ticker == '^GSPC':
-  st.title('SPX (' + ticker + ') 0DT Price Range')
+  st.subheader('SPX (' + ticker + ') 0DT Price Range')
 else:
-  st.title(ticker + ' 0DT Price Range')
+  st.subheader(ticker + ' 0DT Price Range')
 
 f_data = yf.Ticker(ticker)
 ticker_df = f_data.history(period='1d', interval='1m')
@@ -49,7 +49,7 @@ def vol_profile(df):
   agg_df = agg_df.sort_values(by=['Volume'], ascending=False)
   agg_df = agg_df.set_index('Close')
   # print(agg_df.head(20))
-  return agg_df.head(20)
+  return agg_df.head(30)
 
 # def get_high_vol_close(df, high_vol):
 #   hv_df = df.where(df.Volume >= high_vol)
@@ -61,12 +61,14 @@ st.text('Data date: ' + str(ticker_df.index[-1]))
 st.subheader('Spot Price: $' + close_price)
 
 vol_prof_df = vol_profile(ticker_df)
-poc = vol_prof_df.head(1).index.to_numpy()[0]
-poc_vol = vol_prof_df.head(1).Volume.to_numpy()[0]
-# print(poc, poc_vol)
-poc_html = '<p style="font-family:sans-serif; color:Red;">POC: ' + str("{:,.0f}".format(poc)) + ', Vol: ' + str("{:,.0f}".format(poc_vol)) + '</p>'
+poc = vol_prof_df.head(1).index.to_list()[0]
+poc_vol = vol_prof_df.head(1).Volume.to_list()[0]
 
+poc_html = '<p style="font-family:sans-serif; color:Red;">POC: ' + str("{:,.0f}".format(poc)) + ', Vol: ' + str("{:,.0f}".format(poc_vol)) + '</p>'
 st.write(poc_html, unsafe_allow_html=True)
+# st.write("Top 10 Bars")
+# st.bar_chart(vol_prof_df.head(10))
+# st.write("Top 20 Bars")
 st.bar_chart(vol_prof_df)
 
 # https://tradingfuel.com/pivot-point-calculator-and-strategy/
