@@ -3,7 +3,7 @@ import streamlit as st
 import pandas as pd
 # import altair as alt
 # from vega_datasets import data
-# import re
+# import r 
 # import plotly.graph_objects as go
 # import math
 
@@ -210,15 +210,23 @@ def calc_atr(df, period):
 
 st.sidebar.title('Average True Range')
 num = 14
-user_num = st.sidebar.slider('ATR: Select days in the period', 1, 200, 1, 1)
+user_num = st.sidebar.slider('ATR: Select days in the period', 1, 200, num, 1)
 if user_num:
   num = int(user_num)
 atr = calc_atr(df_1y, num)
 
-# print('atr', atr)
-st.subheader('ATR (' + str(num) +'-day period): ' + str(atr))
+mid_point = round(atr/2, 2)
+upper_bound = str(round((ticker_close + mid_point), 2))
+lower_bound = str(round((ticker_close - mid_point), 2))
+max_today = str("{:,.2f}".format(ticker_high))
+min_today = str("{:,.2f}".format(ticker_low))
+atr_today = str("{:,.2f}".format(ticker_high - ticker_low))
 
-st.subheader('1 Day Volume Chart')
+# print('atr', atr)
+st.markdown('#### ATR (' + str(num) +'-day): ' + str(atr))
+st.markdown('##### Today ATR:' + atr_today + ', High: ' + max_today  + ', Low: ' + min_today)
+st.markdown('##### Dynamic Range: ' + upper_bound + '~' + lower_bound)
+st.markdown('#### 1 Day Volume Chart')
 st.line_chart(ticker_df.Volume)
 
 # Print Charts
