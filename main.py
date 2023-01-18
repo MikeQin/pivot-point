@@ -12,7 +12,7 @@ import pandas as pd
 pd.options.display.float_format = "{:,.2f}".format
 
 # Sidebar section
-ticker = '^GSPC'
+ticker = '^SPX'
 # def submit_cb():
 #   ticker = user_ticker
 st.sidebar.write('# Enter Ticker')
@@ -24,7 +24,7 @@ if user_ticker:
 # print('Ticker', ticker)
 
 # Main section
-if ticker == '^GSPC':
+if ticker == '^SPX':
   st.subheader('SPX (' + ticker + ') 0DT Price Range')
 else:
   st.subheader(ticker + ' 0DT Price Range')
