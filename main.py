@@ -16,7 +16,7 @@ ticker = '^SPX'
 # def submit_cb():
 #   ticker = user_ticker
 st.sidebar.write('# Enter Ticker')
-user_ticker = st.sidebar.text_input('Ticker (Symbol)', value='^GSPC') # , on_change=submit_cb
+user_ticker = st.sidebar.text_input('Ticker (Symbol)', value='^SPX') # , on_change=submit_cb
 
 if user_ticker:
   ticker = user_ticker.upper()
