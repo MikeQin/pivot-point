@@ -31,7 +31,7 @@ else:
 
 f_data = yf.Ticker(ticker)
 ticker_df = f_data.history(period='1d', interval='1m')
-# print(ticker_df)
+# print('LAST TWO: ', ticker_df.tail(2))
 # print(ticker_df.info())
 
 ticker_open = ticker_df.Open[0]
@@ -214,19 +214,21 @@ user_num = st.sidebar.slider('ATR: Select days in the period', 1, 200, num, 1)
 if user_num:
   num = int(user_num)
 atr = calc_atr(df_1y, num)
+atr_1d = calc_atr(df_1y, 1)
 
 mid_point = round(atr/2, 2)
 upper_bound = str(round((ticker_close + mid_point), 2))
 lower_bound = str(round((ticker_close - mid_point), 2))
 max_today = str("{:,.2f}".format(ticker_high))
 min_today = str("{:,.2f}".format(ticker_low))
-atr_today = str("{:,.2f}".format(ticker_high - ticker_low))
+atr_today = str("{:,.2f}".format(atr_1d))
 
 # print('atr', atr)
 st.markdown('#### ATR (' + str(num) +'-day): ' + str(atr))
 st.markdown('##### Today ATR:' + atr_today + ', High: ' + max_today  + ', Low: ' + min_today)
 st.markdown('##### Dynamic Range: ' + upper_bound + '~' + lower_bound)
-st.markdown('#### 1 Day Volume Chart')
+st.markdown('#### Today Volume')
+# ticker_df.tz_convert('US/Central')
 st.line_chart(ticker_df.Volume)
 
 # Print Charts
