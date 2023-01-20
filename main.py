@@ -15,12 +15,12 @@ from streamlit_autorefresh import st_autorefresh
 # st_autorefresh(interval=5 * 60 * 1000, key="dataframerefresh")
 # refresh 20 sec
 refresh_time = 20 * 1000
-now = dt.now()
-today_8_30am = now.replace(hour=8, minute=30, second=0, microsecond=0)
-today_4pm = now.replace(hour=16, minute=0, second=0, microsecond=0)
+now = dt.now(pytz.timezone('US/Eastern'))
+today_9_30am = now.replace(hour=9, minute=30, second=0, microsecond=0)
+today_4pm = now.replace(hour=4, minute=0, second=0, microsecond=0)
 
 def is_refresh():
-  if (today_8_30am.time() < now.time() < today_4pm.time()) and now.weekday() < 5:
+  if (today_9_30am.time() < now.time() < today_4pm.time()) and now.weekday() < 5:
     return True
   return False
 
