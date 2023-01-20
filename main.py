@@ -273,10 +273,16 @@ st.markdown("""
 .css-9s5bis {
   visibility: hidden;
 }
+.css-h5rgaw {
+  visibility: hidden;
+}
 </style>
 """, unsafe_allow_html=True)
 
 # Footer
+# .css-h5rgaw {
+#   visibility: hidden;
+# }
 # .viewerBadge_link__1S137 {
 #   visibility: hidden;
 # }
