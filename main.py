@@ -131,8 +131,8 @@ st.markdown(hide_table_row_index, unsafe_allow_html=True)
 # Display a static table
 st.markdown('##### Pivot Point (high, low, close)')
 st.table(df)
-st.markdown('##### Pivot Point (open, high, low, close)')
-st.table(df4)
+# st.markdown('##### Pivot Point (open, high, low, close)')
+# st.table(df4)
 # Bar Chart
 # st.bar_chart(df)
 
@@ -163,7 +163,7 @@ cpr_df = pd.DataFrame(cpr_dict)
 # Display dataframe table
 st.markdown('##### Central Pivot Range (CPR)')
 st.table(cpr_df)
-st.bar_chart(cpr_df)
+# st.bar_chart(cpr_df)
 
 # Line Chart
 # st.line_chart(ticker_df.Close)
