@@ -1,7 +1,8 @@
 import yfinance as yf
 import streamlit as st
 import pandas as pd
-# from datetime import datetime as dt
+from datetime import datetime as dt
+import pytz
 # import altair as alt
 # from vega_datasets import data
 # import r 
@@ -14,7 +15,17 @@ from streamlit_autorefresh import st_autorefresh
 # st_autorefresh(interval=5 * 60 * 1000, key="dataframerefresh")
 # refresh 20 sec
 refresh_time = 20 * 1000
-st_autorefresh(interval=refresh_time, key="dataframerefresh")
+now = dt.now()
+today_8_30am = now.replace(hour=8, minute=30, second=0, microsecond=0)
+today_4pm = now.replace(hour=16, minute=0, second=0, microsecond=0)
+
+def is_refresh():
+  if (today_8_30am.time() < now.time() < today_4pm.time()) and now.weekday() < 5:
+    return True
+  return False
+
+if is_refresh():
+  st_autorefresh(interval=refresh_time, key="dataframerefresh")
 
 # https://en.wikipedia.org/wiki/Pivot_point_(technical_analysis)
 
@@ -65,8 +76,8 @@ def vol_profile(df):
 #   close = hv_df.Close.max()
 #   return close
 
-st.text('Data date: ' + str(ticker_df.index[-1]) + '. Page refreshed every ' 
-  + str("{:,.0f}".format(refresh_time/1000)) + ' seconds!')
+st.text('Data date: ' + str(ticker_df.index[-1]) + '. Refreshed: ' 
+  + str("{:,.0f}".format(refresh_time/1000)) + ' sec! Time: ' + str(now.time()))
 
 st.subheader('Spot Price: $' + close_price)
 
