@@ -1,6 +1,7 @@
 import yfinance as yf
 import streamlit as st
 import pandas as pd
+# from datetime import datetime as dt
 # import altair as alt
 # from vega_datasets import data
 # import r 
@@ -66,10 +67,16 @@ poc_vol = vol_prof_df.head(1).Volume.to_list()[0]
 
 poc_html = '<p style="font-family:sans-serif; color:Red;">POC: ' + str("{:,.0f}".format(poc)) + ', Vol: ' + str("{:,.0f}".format(poc_vol)) + '</p>'
 st.write(poc_html, unsafe_allow_html=True)
-# st.write("Top 10 Bars")
-# st.bar_chart(vol_prof_df.head(10))
-# st.write("Top 20 Bars")
 st.bar_chart(vol_prof_df)
+
+# Select Max Vol Row
+max_vol_row = ticker_df[ticker_df.Volume == ticker_df.Volume.max()]
+max_vol = round(max_vol_row.Volume.to_numpy()[0],0)
+max_vol_price = round(max_vol_row.Close.to_numpy()[0],2)
+# print('Result: ',max_vol, max_vol_price)
+# print("%s %s" % ("Hello", "World"))
+st.markdown('#### Closing Price: %s, Volume: %s' % (str("{:,.2f}".format(max_vol_price)), str("{:,.0f}".format(max_vol))))
+st.line_chart(data=ticker_df, x='Close', y='Volume')
 
 # https://tradingfuel.com/pivot-point-calculator-and-strategy/
 # https://www.pivotpointcalculator.com/
@@ -227,9 +234,13 @@ atr_today = str("{:,.2f}".format(atr_1d))
 st.markdown('#### ATR (' + str(num) +'-day): ' + str(atr))
 st.markdown('##### Today ATR:' + atr_today + ', High: ' + max_today  + ', Low: ' + min_today)
 st.markdown('##### Dynamic Range: ' + upper_bound + '~' + lower_bound)
-st.markdown('#### Today Volume')
-# ticker_df.tz_convert('US/Central')
-st.line_chart(ticker_df.Volume)
+# st.markdown('#### Today Volume')
+
+# st.line_chart(data=ticker_df, x='Close', y='Volume')
+
+# print(ticker_df.index)
+# print(ticker_df.tail(3))
+# print(ticker_df.info())
 
 # Print Charts
 # st.line_chart(df_1y.Close)
