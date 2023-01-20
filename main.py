@@ -8,6 +8,14 @@ import pandas as pd
 # import plotly.graph_objects as go
 # import math
 
+from streamlit_autorefresh import st_autorefresh
+
+# update every 5 mins
+# st_autorefresh(interval=5 * 60 * 1000, key="dataframerefresh")
+# refresh 20 sec
+refresh_time = 20 * 1000
+st_autorefresh(interval=refresh_time, key="dataframerefresh")
+
 # https://en.wikipedia.org/wiki/Pivot_point_(technical_analysis)
 
 pd.options.display.float_format = "{:,.2f}".format
@@ -57,7 +65,8 @@ def vol_profile(df):
 #   close = hv_df.Close.max()
 #   return close
 
-st.text('Data date: ' + str(ticker_df.index[-1]))
+st.text('Data date: ' + str(ticker_df.index[-1]) + '. Page refreshed every ' 
+  + str("{:,.0f}".format(refresh_time/1000)) + ' seconds!')
 
 st.subheader('Spot Price: $' + close_price)
 
