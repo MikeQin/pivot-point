@@ -266,3 +266,17 @@ st.markdown('##### Dynamic Range: ' + upper_bound + '~' + lower_bound)
 # st.line_chart(df_1y.Close)
 # st.subheader('Volume Chart')
 # st.line_chart(df_1y.Volume)
+
+# Remove Hamburger Menu, and Footer
+st.markdown("""
+<style>
+.css-9s5bis {
+  visibility: hidden;
+}
+</style>
+""", unsafe_allow_html=True)
+
+# Footer
+# .viewerBadge_link__1S137 {
+#   visibility: hidden;
+# }
