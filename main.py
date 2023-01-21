@@ -123,11 +123,11 @@ def calc_pp_r_s(open, high, low, close, useOpen):
     'R1': [str("{:,.2f}".format(r1))], 
     'R2': [str("{:,.2f}".format(r2))],
     'R3': [str("{:,.2f}".format(r3))],
-    'R4': [str("{:,.2f}".format(r4))], 
+    # 'R4': [str("{:,.2f}".format(r4))], 
     'S1':    [str("{:,.2f}".format(s1))], 
     'S2':    [str("{:,.2f}".format(s2))], 
-    'S3':    [str("{:,.2f}".format(s3))],
-    'S4':    [str("{:,.2f}".format(s4))]
+    'S3':    [str("{:,.2f}".format(s3))]
+    # 'S4':    [str("{:,.2f}".format(s4))]
   }
 
   return result
@@ -171,9 +171,10 @@ def calc_cpr(high, low, close):
   tc = (pp - bc) + pp
   
   cpr = {
-    'Top PP': [str("{:,.2f}".format(tc))],
-    'Middle PP': [str("{:,.2f}".format(pp))],
-    'Bottom PP': [str("{:,.2f}".format(bc))]
+    'Range': [str("{:,.2f}".format(abs(tc-bc)))],
+    'Top': [str("{:,.2f}".format(tc))],
+    # 'Middle PP': [str("{:,.2f}".format(pp))],
+    'Bottom': [str("{:,.2f}".format(bc))]
   }
   return cpr
 
