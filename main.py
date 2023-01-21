@@ -118,7 +118,7 @@ def calc_pp_r_s(open, high, low, close, useOpen):
   r4 = high + 3 * (pp - low) # r3 = (pp - s2) + r2
   s4 = low - 3 * (high - pp) # s3 = pp - (r2 -s2)
   result = {
-    'useOpen': useOpen,
+    # 'useOpen': useOpen,
     'PP':  [str("{:,.2f}".format(pp))], 
     'R1': [str("{:,.2f}".format(r1))], 
     'R2': [str("{:,.2f}".format(r2))],
