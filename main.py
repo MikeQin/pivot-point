@@ -325,7 +325,7 @@ call_chart = alt.Chart(calls_df.drop(drop_rows), title='Call/Put Volume '+ expir
 put_chart = alt.Chart(puts_df.drop(drop_rows)).mark_bar(opacity=0.5).encode(x='strike', y='volume', color=alt.value("#FF3D3A"))
 xrule = alt.Chart(calls_df).mark_rule(color="blue", strokeWidth=1).encode(x=alt.datum(spot_price))
 # st.markdown('##### Option Volume Live: ' + expiry_date)
-call_chart + put_chart + xrule
+st.altair_chart(call_chart + put_chart + xrule, use_container_width=True)
 
 expiry_date = spx_data.options[1]
 spx_option_chain = spx_data.option_chain(expiry_date)
@@ -336,4 +336,4 @@ call_chart = alt.Chart(calls_df.drop(drop_rows), title='Call/Put Volume '+ expir
 put_chart = alt.Chart(puts_df.drop(drop_rows)).mark_bar(opacity=0.5).encode(x='strike', y='volume', color=alt.value("#FF3D3A"))
 xrule = alt.Chart(calls_df).mark_rule(color="blue", strokeWidth=1).encode(x=alt.datum(spot_price))
 # st.markdown('###### Option Volume Live: ' + expiry_date)
-call_chart + put_chart + xrule
+st.altair_chart(call_chart + put_chart + xrule, use_container_width=True)
