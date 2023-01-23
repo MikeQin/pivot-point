@@ -3,6 +3,8 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime as dt
 import pytz
+import numpy as np
+import altair as alt
 # import altair as alt
 # from vega_datasets import data
 # import r 
@@ -287,3 +289,42 @@ st.markdown("""
 # .viewerBadge_link__1S137 {
 #   visibility: hidden;
 # }
+
+def create_xticks(n1, n2):
+  n1 = int(n1 / 10)
+  n2 = int(n2 / 10)
+
+  arr = []
+  for x in range (n1 * 10, n2 * 10, 25):
+    arr.append(x)
+
+  return arr
+
+spx_data = yf.Ticker('^SPX')
+# spot_price = spx_data.info['regularMarketPrice']
+spot_price = round(ticker_close, 2)
+expiry_date = spx_data.options[0]
+spx_option_chain = spx_data.option_chain(expiry_date)
+calls_df = spx_option_chain.calls
+puts_df = spx_option_chain.puts
+
+# from_strike = 0.85 * spot_price # 0.8
+# to_strike = 1.15 * spot_price # 1.2
+# calls_vol_max = calls_df.volume.max()
+# puts_vol_max = puts_df.volume.max()
+# max_opt_vol = puts_vol_max
+# if calls_vol_max > puts_vol_max:
+#   max_opt_vol = calls_vol_max
+
+drop_rows = []
+for i in range(0, 11):
+  drop_rows.append(i)
+
+# for i in range(105, 115):
+#   drop_rows.append(i)
+
+call_chart = alt.Chart(calls_df.drop(drop_rows)).mark_bar().encode(x='strike', y='volume', color=alt.value("green"))
+put_chart = alt.Chart(puts_df.drop(drop_rows)).mark_bar().encode(x='strike', y='volume', color=alt.value("red"))
+xrule = alt.Chart().mark_rule(color="blue", strokeWidth=2).encode(x=alt.datum(spot_price))
+st.markdown('#### Option Volume Live Chart: ' + expiry_date)
+call_chart + put_chart + xrule
