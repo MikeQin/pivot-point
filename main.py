@@ -321,10 +321,10 @@ for i in range(0, 11):
 # call_chart = alt.Chart(calls_df.drop(drop_rows)).mark_bar().encode(alt.X('strike', axis=alt.Axis(values=x_strikes)), y='volume', color=alt.value("green"))
 # put_chart = alt.Chart(puts_df.drop(drop_rows)).mark_bar().encode(alt.X('strike', axis=alt.Axis(values=x_strikes)), y='volume', color=alt.value("red"))
 
-call_chart = alt.Chart(calls_df.drop(drop_rows)).mark_bar().encode(x='strike', y='volume', color=alt.value("green"))
-put_chart = alt.Chart(puts_df.drop(drop_rows)).mark_bar().encode(x='strike', y='volume', color=alt.value("#FF3D3A"))
+call_chart = alt.Chart(calls_df.drop(drop_rows), title='Call/Put Volume '+ expiry_date).mark_bar().encode(x='strike', y='volume', color=alt.value("green"))
+put_chart = alt.Chart(puts_df.drop(drop_rows)).mark_bar(opacity=0.5).encode(x='strike', y='volume', color=alt.value("#FF3D3A"))
 xrule = alt.Chart(calls_df).mark_rule(color="blue", strokeWidth=1).encode(x=alt.datum(spot_price))
-st.markdown('##### Option Volume Live: ' + expiry_date)
+# st.markdown('##### Option Volume Live: ' + expiry_date)
 call_chart + put_chart + xrule
 
 expiry_date = spx_data.options[1]
@@ -332,8 +332,8 @@ spx_option_chain = spx_data.option_chain(expiry_date)
 calls_df = spx_option_chain.calls
 puts_df = spx_option_chain.puts
 
-call_chart = alt.Chart(calls_df.drop(drop_rows)).mark_bar().encode(x='strike', y='volume', color=alt.value("green"))
-put_chart = alt.Chart(puts_df.drop(drop_rows)).mark_bar().encode(x='strike', y='volume', color=alt.value("#FF3D3A"))
+call_chart = alt.Chart(calls_df.drop(drop_rows), title='Call/Put Volume '+ expiry_date).mark_bar().encode(x='strike', y='volume', color=alt.value("green"))
+put_chart = alt.Chart(puts_df.drop(drop_rows)).mark_bar(opacity=0.5).encode(x='strike', y='volume', color=alt.value("#FF3D3A"))
 xrule = alt.Chart(calls_df).mark_rule(color="blue", strokeWidth=1).encode(x=alt.datum(spot_price))
-st.markdown('###### Option Volume Live: ' + expiry_date)
+# st.markdown('###### Option Volume Live: ' + expiry_date)
 call_chart + put_chart + xrule
