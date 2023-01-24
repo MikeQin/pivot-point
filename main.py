@@ -89,6 +89,8 @@ poc_vol = vol_prof_df.head(1).Volume.to_list()[0]
 
 poc_html = '<p style="font-family:sans-serif; color:Red;">POC: ' + str("{:,.0f}".format(poc)) + ', Vol: ' + str("{:,.0f}".format(poc_vol)) + '</p>'
 st.write(poc_html, unsafe_allow_html=True)
+# vp_chart = alt.Chart(vol_prof_df.reset_index(), title="Volume Profile").mark_bar(opacity=0.8).encode(x='index', y='Volume', color=alt.value("blue"))
+# st.altair_chart(vp_chart, use_container_width=True)
 st.bar_chart(vol_prof_df)
 
 # Select Max Vol Row
@@ -303,37 +305,55 @@ st.markdown("""
 spx_data = yf.Ticker('^SPX')
 # spot_price = spx_data.info['regularMarketPrice']
 spot_price = round(ticker_close, 2)
-expiry_date = spx_data.options[0]
-spx_option_chain = spx_data.option_chain(expiry_date)
-calls_df = spx_option_chain.calls
-puts_df = spx_option_chain.puts
-
-# from_strike = 0.8 * spot_price # 0.8
-# to_strike = 1.2 * spot_price # 1.2
-# x_strikes = create_strikes(from_strike, to_strike)
-
 drop_rows = []
 for i in range(0, 11):
   drop_rows.append(i)
-# for i in range(105, 115):
-#   drop_rows.append(i)
+title = str('SPX: %s, Call/Put Volumes for ' % (spot_price))
 
-# call_chart = alt.Chart(calls_df.drop(drop_rows)).mark_bar().encode(alt.X('strike', axis=alt.Axis(values=x_strikes)), y='volume', color=alt.value("green"))
-# put_chart = alt.Chart(puts_df.drop(drop_rows)).mark_bar().encode(alt.X('strike', axis=alt.Axis(values=x_strikes)), y='volume', color=alt.value("red"))
+for i in range (5):
+  expiry_date = spx_data.options[i]
+  spx_option_chain = spx_data.option_chain(expiry_date)
+  calls_df = spx_option_chain.calls
+  puts_df = spx_option_chain.puts
+  # call max vol row
+  calls_max_vol_row = spx_option_chain.calls[spx_option_chain.calls.volume == spx_option_chain.calls.volume.max()]
+  calls_max_vol_strike = calls_max_vol_row.strike.to_numpy()[0]
+  calls_max_vol = calls_max_vol_row.volume.to_numpy()[0]
+  # put max vol row
+  puts_max_vol_row = spx_option_chain.puts[spx_option_chain.puts.volume == spx_option_chain.puts.volume.max()]
+  puts_max_vol_strike = puts_max_vol_row.strike.to_numpy()[0]
+  puts_max_vol = puts_max_vol_row.volume.to_numpy()[0]
+  trend_json = {
+    "strike": [calls_max_vol_strike, puts_max_vol_strike],
+    "volume": [calls_max_vol, puts_max_vol]
+  }
+  # Create trend DF
+  trend_df = pd.DataFrame(trend_json)
 
-call_chart = alt.Chart(calls_df.drop(drop_rows), title='Call/Put Volume '+ expiry_date).mark_bar().encode(x='strike', y='volume', color=alt.value("green"))
-put_chart = alt.Chart(puts_df.drop(drop_rows)).mark_bar(opacity=0.5).encode(x='strike', y='volume', color=alt.value("#FF3D3A"))
-xrule = alt.Chart(calls_df).mark_rule(color="blue", strokeWidth=1).encode(x=alt.datum(spot_price))
-# st.markdown('##### Option Volume Live: ' + expiry_date)
-st.altair_chart(call_chart + put_chart + xrule, use_container_width=True)
+  # from_strike = 0.8 * spot_price # 0.8
+  # to_strike = 1.2 * spot_price # 1.2
+  # x_strikes = create_strikes(from_strike, to_strike)
 
-expiry_date = spx_data.options[1]
-spx_option_chain = spx_data.option_chain(expiry_date)
-calls_df = spx_option_chain.calls
-puts_df = spx_option_chain.puts
+  # for i in range(105, 115):
+  #   drop_rows.append(i)
 
-call_chart = alt.Chart(calls_df.drop(drop_rows), title='Call/Put Volume '+ expiry_date).mark_bar().encode(x='strike', y='volume', color=alt.value("green"))
-put_chart = alt.Chart(puts_df.drop(drop_rows)).mark_bar(opacity=0.5).encode(x='strike', y='volume', color=alt.value("#FF3D3A"))
-xrule = alt.Chart(calls_df).mark_rule(color="blue", strokeWidth=1).encode(x=alt.datum(spot_price))
-# st.markdown('###### Option Volume Live: ' + expiry_date)
-st.altair_chart(call_chart + put_chart + xrule, use_container_width=True)
+  # call_chart = alt.Chart(calls_df.drop(drop_rows)).mark_bar().encode(alt.X('strike', axis=alt.Axis(values=x_strikes)), y='volume', color=alt.value("green"))
+  # put_chart = alt.Chart(puts_df.drop(drop_rows)).mark_bar().encode(alt.X('strike', axis=alt.Axis(values=x_strikes)), y='volume', color=alt.value("red"))
+  
+  # Option Chart
+  
+  call_chart = alt.Chart(calls_df.drop(drop_rows), title=title + expiry_date).mark_bar(opacity=0.5).encode(x='strike', y='volume', color=alt.value("green"))
+  put_chart = alt.Chart(puts_df.drop(drop_rows)).mark_bar(opacity=0.5).encode(x='strike', y='volume', color=alt.value("#FF3D3A"))
+  trend_line = alt.Chart(trend_df).mark_line().encode(x='strike', y='volume', color=alt.value("black"))
+  xrule = alt.Chart(calls_df).mark_rule(color="blue", strokeWidth=1).encode(x=alt.datum(spot_price))
+  text = trend_line.mark_text(
+      align='left',
+      # baseline='middle',
+      dx=5, dy=-5,
+      fontStyle='regular',
+      fontSize=16
+    ).encode(
+      text=alt.Text('strike')
+    )
+  # st.markdown('##### Option Volume Live: ' + expiry_date)
+  st.altair_chart(call_chart + put_chart + xrule + trend_line + text, use_container_width=True)
