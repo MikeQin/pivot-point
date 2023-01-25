@@ -63,7 +63,6 @@ ticker_close = ticker_df.Close[-1]
 close_price = str("{:,.2f}".format(ticker_close))
 # print(ticker_open, ticker_high, ticker_low, ticker_close)
 
-# Edition 1
 def vol_profile(df):
   agg_df = df.copy()
   agg_df = agg_df.drop(['Open', 'High', 'Low', 'Dividends', 'Stock Splits'], axis=1)
@@ -313,14 +312,15 @@ st.markdown("""
 #     arr.append(x)
 
 #   return arr
-
-spx_data = yf.Ticker('^SPX')
+if ticker == '^GSPC':
+  ticker = '^SPX'
+spx_data = yf.Ticker(ticker)
 # spot_price = spx_data.info['regularMarketPrice']
 spot_price = round(ticker_close, 2)
 drop_rows = []
 for i in range(0, 11):
   drop_rows.append(i)
-title = str('SPX: %s, Call/Put Volumes for ' % (spot_price))
+title = str('%s: %s, Call/Put Volumes for ' % (ticker, spot_price))
 
 for i in range (5):
   expiry_date = spx_data.options[i]
