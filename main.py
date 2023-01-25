@@ -63,15 +63,17 @@ ticker_close = ticker_df.Close[-1]
 close_price = str("{:,.2f}".format(ticker_close))
 # print(ticker_open, ticker_high, ticker_low, ticker_close)
 
+# Edition 1
 def vol_profile(df):
   agg_df = df.copy()
   agg_df = agg_df.drop(['Open', 'High', 'Low', 'Dividends', 'Stock Splits'], axis=1)
   agg_df['Close'] = agg_df['Close'].astype(int)
-  agg_df = agg_df.groupby('Close').sum().reset_index()
+  agg_df = agg_df.groupby('Close').sum()
+  # agg_df = agg_df.groupby('Close')["Volume"].sum().reset_index(name='Volume')
   agg_df = agg_df.sort_values(by=['Volume'], ascending=False)
-  agg_df = agg_df.set_index('Close')
-  # print(agg_df.head(20))
-  return agg_df.head(30)
+  # agg_df = agg_df.set_index('Close')
+  # agg_df.dropna()
+  return agg_df #.head(30)
 
 # def get_high_vol_close(df, high_vol):
 #   hv_df = df.where(df.Volume >= high_vol)
@@ -87,11 +89,21 @@ vol_prof_df = vol_profile(ticker_df)
 poc = vol_prof_df.head(1).index.to_list()[0]
 poc_vol = vol_prof_df.head(1).Volume.to_list()[0]
 
-poc_html = '<p style="font-family:sans-serif; color:Red;">POC: ' + str("{:,.0f}".format(poc)) + ', Vol: ' + str("{:,.0f}".format(poc_vol)) + '</p>'
+poc_html = '<h5 style="font-family:sans-serif; color:Red;">POC: ' + str("{:,.0f}".format(poc)) + ', Vol: ' + str("{:,.0f}".format(poc_vol)) + '</h5>'
 st.write(poc_html, unsafe_allow_html=True)
-# vp_chart = alt.Chart(vol_prof_df.reset_index(), title="Volume Profile").mark_bar(opacity=0.8).encode(x='index', y='Volume', color=alt.value("blue"))
-# st.altair_chart(vp_chart, use_container_width=True)
 st.bar_chart(vol_prof_df)
+st.area_chart(vol_prof_df)
+
+# vp_chart = alt.Chart(vol_prof_df, title="Volume Profile").mark_bar(opacity=0.8).encode(x='Close:O', y='Volume:N', color=alt.condition(
+#         alt.datum.Close == poc,  # If the year is 1810 this test returns True,
+#         alt.value('orange'),     # which sets the bar orange.
+#         alt.value('steelblue')   # And if it's not true it sets the bar steelblue.
+#     ))
+# df_new = vol_prof_df.copy()
+# df_new = df_new.reset_index()
+# print(df_new)
+# vprof_chart = alt.Chart(vol_prof_df, title="Volume Profile").mark_bar().encode(x="Volume:N", y='Close:O')
+# st.altair_chart(vprof_chart, use_container_width=True)
 
 # Select Max Vol Row
 max_vol_row = ticker_df[ticker_df.Volume == ticker_df.Volume.max()]
@@ -349,7 +361,7 @@ for i in range (5):
   text = trend_line.mark_text(
       align='left',
       # baseline='middle',
-      dx=5, dy=-5,
+      dx=7, dy=-7,
       fontStyle='regular',
       fontSize=16
     ).encode(
@@ -357,3 +369,5 @@ for i in range (5):
     )
   # st.markdown('##### Option Volume Live: ' + expiry_date)
   st.altair_chart(call_chart + put_chart + xrule + trend_line + text, use_container_width=True)
+
+  # print(trend_df)
