@@ -20,6 +20,7 @@ refresh_time = 30 * 1000
 now = dt.now(pytz.timezone('US/Eastern'))
 today_9_30am = now.replace(hour=9, minute=30, second=0, microsecond=0)
 today_4pm = now.replace(hour=16, minute=0, second=0, microsecond=0)
+now_str = now.strftime("%m/%d/%Y, %H:%M:%S")
 
 def is_refresh():
   if (today_9_30am.time() < now.time() < today_4pm.time()) and now.weekday() < 5:
@@ -80,7 +81,7 @@ def vol_profile(df):
 #   return close
 
 st.text('Data date: ' + str(ticker_df.index[-1]) + '. Refreshed: ' 
-  + str("{:,.0f}".format(refresh_time/1000)) + ' sec! Time: ' + str(now.time()))
+  + str("{:,.0f}".format(refresh_time/1000)) + ' sec! Time: ' + now_str)
 
 st.subheader('Spot Price: $' + close_price)
 
@@ -325,8 +326,8 @@ spot_price = round(ticker_close, 2)
 drop_rows = []
 for i in range(0, 11):
   drop_rows.append(i)
-title = str('%s: %s, Call/Put OI/Vol for ' % (ticker, spot_price))
-legend = ", C-VOL: Green, C-OI: Blue, P-VOL: Red, P-OI: Orange"
+title = str('%s: %s, Options for ' % (ticker, spot_price))
+legend = ", VOL: GR, OI: BO, " + now_str
 
 for i in range (5):
   expiry_date = spx_data.options[i]
@@ -359,7 +360,6 @@ for i in range (5):
   # put_chart = alt.Chart(puts_df.drop(drop_rows)).mark_bar().encode(alt.X('strike', axis=alt.Axis(values=x_strikes)), y='volume', color=alt.value("red"))
   
   # Option Chart
-  
   call_vol_chart = alt.Chart(calls_df.drop(drop_rows), title=title + expiry_date + legend).mark_line(opacity=0.5).encode(x='strike', y='volume', color=alt.value("green"))
   call_oi_chart = alt.Chart(calls_df.drop(drop_rows)).mark_line(opacity=0.5).encode(x='strike', y='openInterest', color=alt.value("steelblue"))
   put_vol_chart = alt.Chart(puts_df.drop(drop_rows)).mark_line(opacity=0.5).encode(x='strike', y='volume', color=alt.value("#FF3D3A"))
@@ -383,7 +383,7 @@ for i in range (5):
     put_oi_chart +
     xrule + 
     max_vol_points + 
-    labels, 
+    labels,
     use_container_width=True
   )
 
