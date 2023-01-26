@@ -84,33 +84,37 @@ st.text('Data date: ' + str(ticker_df.index[-1]) + '. Refreshed: '
 
 st.subheader('Spot Price: $' + close_price)
 
+# Note here vol_prof_df has index: Close, 1 column: Volume
 vol_prof_df = vol_profile(ticker_df)
 poc = vol_prof_df.head(1).index.to_list()[0]
 poc_vol = vol_prof_df.head(1).Volume.to_list()[0]
 
-poc_html = '<h5 style="font-family:sans-serif; color:Red;">POC: ' + str("{:,.0f}".format(poc)) + ', Vol: ' + str("{:,.0f}".format(poc_vol)) + '</h5>'
+poc_html = '<h5 style="font-family:sans-serif; color:orange;">POC: ' + str("{:,.0f}".format(poc)) + ', Vol: ' + str("{:,.0f}".format(poc_vol)) + '</h5>'
 st.write(poc_html, unsafe_allow_html=True)
-st.bar_chart(vol_prof_df)
-st.area_chart(vol_prof_df)
+# Note here vol_prof_df has index: Close, 1 column: Volume
+# st.bzar_chart(vol_prof_df)
+# st.area_chart(vol_prof_df)
 
-# vp_chart = alt.Chart(vol_prof_df, title="Volume Profile").mark_bar(opacity=0.8).encode(x='Close:O', y='Volume:N', color=alt.condition(
-#         alt.datum.Close == poc,  # If the year is 1810 this test returns True,
-#         alt.value('orange'),     # which sets the bar orange.
-#         alt.value('steelblue')   # And if it's not true it sets the bar steelblue.
-#     ))
-# df_new = vol_prof_df.copy()
-# df_new = df_new.reset_index()
-# print(df_new)
-# vprof_chart = alt.Chart(vol_prof_df, title="Volume Profile").mark_bar().encode(x="Volume:N", y='Close:O')
-# st.altair_chart(vprof_chart, use_container_width=True)
+# Note after reset, vol_prof_df has index: sequence, 2 columns: Close, Volume
+# Altair can't use index, and it must use columns as x, y
+vol_prof_df = vol_prof_df.reset_index()
+
+title = str("%s Volume Profile, POC: %s, Vol: %s" % (ticker, poc, str("{:,.0f}".format(poc_vol))))
+
+vp_chart = alt.Chart(vol_prof_df, title=title).mark_bar(opacity=0.8).encode(x='Close:O', y='Volume', color=alt.condition(
+        alt.datum.Close == poc,  # If the year is 1810 this test returns True,
+        alt.value('orange'),     # which sets the bar orange.
+        alt.value('steelblue')   # And if it's not true it sets the bar steelblue.
+    ))
+
+st.altair_chart(vp_chart, use_container_width=True)
 
 # Select Max Vol Row
 max_vol_row = ticker_df[ticker_df.Volume == ticker_df.Volume.max()]
 max_vol = round(max_vol_row.Volume.to_numpy()[0],0)
 max_vol_price = round(max_vol_row.Close.to_numpy()[0],2)
-# print('Result: ',max_vol, max_vol_price)
-# print("%s %s" % ("Hello", "World"))
-st.markdown('#### Closing Price: %s, Volume: %s' % (str("{:,.2f}".format(max_vol_price)), str("{:,.0f}".format(max_vol))))
+# print('Max Strike and Vol: ', max_vol, max_vol_price)
+st.markdown('#### Max Vol Price: %s, Volume: %s' % (str("{:,.2f}".format(max_vol_price)), str("{:,.0f}".format(max_vol))))
 st.line_chart(data=ticker_df, x='Close', y='Volume')
 
 # https://tradingfuel.com/pivot-point-calculator-and-strategy/
@@ -358,7 +362,7 @@ for i in range (5):
   put_chart = alt.Chart(puts_df.drop(drop_rows)).mark_bar(opacity=0.5).encode(x='strike', y='volume', color=alt.value("#FF3D3A"))
   trend_line = alt.Chart(trend_df).mark_line().encode(x='strike', y='volume', color=alt.value("black"))
   xrule = alt.Chart(calls_df).mark_rule(color="blue", strokeWidth=1).encode(x=alt.datum(spot_price))
-  text = trend_line.mark_text(
+  labels = trend_line.mark_text(
       align='left',
       # baseline='middle',
       dx=7, dy=-7,
@@ -368,6 +372,6 @@ for i in range (5):
       text=alt.Text('strike')
     )
   # st.markdown('##### Option Volume Live: ' + expiry_date)
-  st.altair_chart(call_chart + put_chart + xrule + trend_line + text, use_container_width=True)
+  st.altair_chart(call_chart + put_chart + xrule + trend_line + labels, use_container_width=True)
 
   # print(trend_df)
