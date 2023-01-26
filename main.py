@@ -321,10 +321,12 @@ if ticker == '^GSPC':
 spx_data = yf.Ticker(ticker)
 # spot_price = spx_data.info['regularMarketPrice']
 spot_price = round(ticker_close, 2)
+
 drop_rows = []
 for i in range(0, 11):
   drop_rows.append(i)
-title = str('%s: %s, Call/Put Volumes for ' % (ticker, spot_price))
+title = str('%s: %s, Call/Put OI/Vol for ' % (ticker, spot_price))
+legend = ", C-VOL: Green, C-OI: Blue, P-VOL: Red, P-OI: Orange"
 
 for i in range (5):
   expiry_date = spx_data.options[i]
@@ -358,8 +360,10 @@ for i in range (5):
   
   # Option Chart
   
-  call_chart = alt.Chart(calls_df.drop(drop_rows), title=title + expiry_date).mark_bar(opacity=0.5).encode(x='strike', y='volume', color=alt.value("green"))
-  put_chart = alt.Chart(puts_df.drop(drop_rows)).mark_bar(opacity=0.5).encode(x='strike', y='volume', color=alt.value("#FF3D3A"))
+  call_vol_chart = alt.Chart(calls_df.drop(drop_rows), title=title + expiry_date + legend).mark_line(opacity=0.5).encode(x='strike', y='volume', color=alt.value("green"))
+  call_oi_chart = alt.Chart(calls_df.drop(drop_rows)).mark_line(opacity=0.5).encode(x='strike', y='openInterest', color=alt.value("steelblue"))
+  put_vol_chart = alt.Chart(puts_df.drop(drop_rows)).mark_line(opacity=0.5).encode(x='strike', y='volume', color=alt.value("#FF3D3A"))
+  put_oi_chart = alt.Chart(puts_df.drop(drop_rows)).mark_line(opacity=0.5).encode(x='strike', y='openInterest', color=alt.value("orange"))
   trend_line = alt.Chart(trend_df).mark_line().encode(x='strike', y='volume', color=alt.value("black"))
   xrule = alt.Chart(calls_df).mark_rule(color="blue", strokeWidth=1).encode(x=alt.datum(spot_price))
   labels = trend_line.mark_text(
@@ -372,6 +376,15 @@ for i in range (5):
       text=alt.Text('strike')
     )
   # st.markdown('##### Option Volume Live: ' + expiry_date)
-  st.altair_chart(call_chart + put_chart + xrule + trend_line + labels, use_container_width=True)
+  st.altair_chart(
+    call_vol_chart + 
+    put_vol_chart + 
+    call_oi_chart +
+    put_oi_chart +
+    xrule + 
+    trend_line + 
+    labels, 
+    use_container_width=True
+  )
 
   # print(trend_df)
