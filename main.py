@@ -364,12 +364,12 @@ for i in range (5):
   call_oi_chart = alt.Chart(calls_df.drop(drop_rows)).mark_line(opacity=0.5).encode(x='strike', y='openInterest', color=alt.value("steelblue"))
   put_vol_chart = alt.Chart(puts_df.drop(drop_rows)).mark_line(opacity=0.5).encode(x='strike', y='volume', color=alt.value("#FF3D3A"))
   put_oi_chart = alt.Chart(puts_df.drop(drop_rows)).mark_line(opacity=0.5).encode(x='strike', y='openInterest', color=alt.value("orange"))
-  trend_line = alt.Chart(trend_df).mark_line().encode(x='strike', y='volume', color=alt.value("black"))
-  xrule = alt.Chart(calls_df).mark_rule(color="blue", strokeWidth=1).encode(x=alt.datum(spot_price))
-  labels = trend_line.mark_text(
-      align='left',
+  max_vol_points = alt.Chart(trend_df).mark_circle(size=60).encode(x='strike', y='volume', color=alt.value("black"))
+  xrule = alt.Chart(calls_df).mark_rule(color="blue", opacity=0.5).encode(x=alt.datum(spot_price))
+  labels = max_vol_points.mark_text(
+      align='center',
       # baseline='middle',
-      dx=7, dy=-7,
+      dx=1, dy=-20,
       fontStyle='regular',
       fontSize=16
     ).encode(
@@ -382,7 +382,7 @@ for i in range (5):
     call_oi_chart +
     put_oi_chart +
     xrule + 
-    trend_line + 
+    max_vol_points + 
     labels, 
     use_container_width=True
   )
