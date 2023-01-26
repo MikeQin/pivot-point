@@ -16,7 +16,7 @@ from streamlit_autorefresh import st_autorefresh
 # update every 5 mins
 # st_autorefresh(interval=5 * 60 * 1000, key="dataframerefresh")
 # refresh 20 sec
-refresh_time = 15 * 1000
+refresh_time = 30 * 1000
 now = dt.now(pytz.timezone('US/Eastern'))
 today_9_30am = now.replace(hour=9, minute=30, second=0, microsecond=0)
 today_4pm = now.replace(hour=16, minute=0, second=0, microsecond=0)
