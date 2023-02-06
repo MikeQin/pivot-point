@@ -70,45 +70,92 @@ def vol_profile(df):
   agg_df['Close'] = agg_df['Close'].astype(int)
   agg_df = agg_df.groupby('Close').sum()
   # agg_df = agg_df.groupby('Close')["Volume"].sum().reset_index(name='Volume')
-  agg_df = agg_df.sort_values(by=['Volume'], ascending=False)
+  # agg_df = agg_df.sort_values(by=['Volume'], ascending=False)
   # agg_df = agg_df.set_index('Close')
   # agg_df.dropna()
   return agg_df #.head(30)
-
-# def get_high_vol_close(df, high_vol):
-#   hv_df = df.where(df.Volume >= high_vol)
-#   close = hv_df.Close.max()
-#   return close
 
 st.text('Data date: ' + str(ticker_df.index[-1]) + '. Refreshed: ' 
   + str("{:,.0f}".format(refresh_time/1000)) + ' sec! Time: ' + now_str)
 
 st.subheader('Spot Price: $' + close_price)
 
+def vol_profile_adj(df):
+  # Convert input df to input_dict
+  input_dict = {}
+  for index, vol in df.iterrows():
+    input_dict[index] = vol.to_numpy()[0]
+
+  # Create index, key dict reference
+  index_ref = {}
+  for index, key in enumerate(input_dict):
+    index_ref[index] = key
+
+  # Create adjusted strike_vol dictionary
+  index_len = len(index_ref)
+  adj_dict = {}
+  for i, k in index_ref.items():
+    if i == 0:
+      adj_dict[k] = input_dict[index_ref[i]]
+    elif i > 0 and i < index_len - 1:
+      adj_dict[k] = round((input_dict[index_ref[i-1]] + input_dict[index_ref[i]] + input_dict[index_ref[i+1]])/3,0)
+    elif i == index_len - 1:
+      adj_dict[k] = round((input_dict[index_ref[i-1]] + input_dict[index_ref[i]])/2,0)
+
+  # return a dataframe 
+  key_arr = adj_dict.keys()
+  val_arr = adj_dict.values()
+  adj_dict = {
+    'Close': key_arr,
+    'Volume': val_arr
+  }
+  raw_df = pd.DataFrame.from_dict(adj_dict).set_index('Close')
+  return raw_df
+
+def find_poc(vol_prof_df):
+  # poc = vol_prof_df.head(1).index.to_list()[0]
+  # poc_vol = vol_prof_df.head(1).Volume.to_list()[0]
+  poc_vol_row = vol_prof_df[vol_prof_df.Volume == vol_prof_df.Volume.max()]
+  poc_vol = round(poc_vol_row.Volume.to_numpy()[0],0)
+  poc = round(poc_vol_row.index.to_numpy()[0],2)
+  return (poc, poc_vol)
+
+def vp_chart(vol_prof_df, color):
+  poc_tuple = find_poc(vol_prof_df)
+  poc = poc_tuple[0]
+  poc_vol = poc_tuple[1]
+
+  poc_html = '<h5 style="font-family:sans-serif; color:'+color+';">POC: ' + str("{:,.0f}".format(poc)) + ', Vol: ' + str("{:,.0f}".format(poc_vol)) + '</h5>'
+  st.write(poc_html, unsafe_allow_html=True)
+  # Note here vol_prof_df has index: Close, 1 column: Volume
+  # st.bzar_chart(vol_prof_df)
+  # st.area_chart(vol_prof_df)
+
+  # Note after reset, vol_prof_df has index: sequence, 2 columns: Close, Volume
+  # Altair can't use index, and it must use columns as x, y
+  vol_prof_df = vol_prof_df.reset_index()
+
+  title = str("%s Volume Profile, POC: %s, Vol: %s" % (ticker, poc, str("{:,.0f}".format(poc_vol))))
+
+  vp_chart = alt.Chart(vol_prof_df, title=title).mark_bar(opacity=0.8).encode(x='Close:O', y='Volume', color=alt.condition(
+          alt.datum.Close == poc,  # If the year is 1810 this test returns True,
+          alt.value(color),     # which sets the bar orange.
+          alt.value('steelblue')   # And if it's not true it sets the bar steelblue.
+      ))
+  
+  return vp_chart
+
+# 1. Volume Profile Chart
 # Note here vol_prof_df has index: Close, 1 column: Volume
 vol_prof_df = vol_profile(ticker_df)
-poc = vol_prof_df.head(1).index.to_list()[0]
-poc_vol = vol_prof_df.head(1).Volume.to_list()[0]
-
-poc_html = '<h5 style="font-family:sans-serif; color:orange;">POC: ' + str("{:,.0f}".format(poc)) + ', Vol: ' + str("{:,.0f}".format(poc_vol)) + '</h5>'
-st.write(poc_html, unsafe_allow_html=True)
-# Note here vol_prof_df has index: Close, 1 column: Volume
-# st.bzar_chart(vol_prof_df)
-# st.area_chart(vol_prof_df)
-
-# Note after reset, vol_prof_df has index: sequence, 2 columns: Close, Volume
-# Altair can't use index, and it must use columns as x, y
-vol_prof_df = vol_prof_df.reset_index()
-
-title = str("%s Volume Profile, POC: %s, Vol: %s" % (ticker, poc, str("{:,.0f}".format(poc_vol))))
-
-vp_chart = alt.Chart(vol_prof_df, title=title).mark_bar(opacity=0.8).encode(x='Close:O', y='Volume', color=alt.condition(
-        alt.datum.Close == poc,  # If the year is 1810 this test returns True,
-        alt.value('orange'),     # which sets the bar orange.
-        alt.value('steelblue')   # And if it's not true it sets the bar steelblue.
-    ))
-
-st.altair_chart(vp_chart, use_container_width=True)
+# Plot chart
+vol_profile_basic_chart = vp_chart(vol_prof_df, 'orange')
+st.altair_chart(vol_profile_basic_chart, use_container_width=True)
+# 2. Adjusted Volume Profile Chart
+adjusted_vol_profile = vol_profile_adj(vol_prof_df)
+# Plot chart
+adjusted_vol_profile_chart = vp_chart(adjusted_vol_profile, '#fc5e03')
+st.altair_chart(adjusted_vol_profile_chart, use_container_width=True)
 
 # Select Max Vol Row
 max_vol_row = ticker_df[ticker_df.Volume == ticker_df.Volume.max()]
