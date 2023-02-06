@@ -96,7 +96,7 @@ def vol_profile_adj(df):
   adj_dict = {}
   for i, k in index_ref.items():
     if i == 0:
-      adj_dict[k] = input_dict[index_ref[i]]
+      adj_dict[k] = round((input_dict[index_ref[i]] + input_dict[index_ref[i+1]])/2,0)
     elif i > 0 and i < index_len - 1:
       adj_dict[k] = round((input_dict[index_ref[i-1]] + input_dict[index_ref[i]] + input_dict[index_ref[i+1]])/3,0)
     elif i == index_len - 1:
