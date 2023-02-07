@@ -120,12 +120,35 @@ def find_poc(vol_prof_df):
   poc = round(poc_vol_row.index.to_numpy()[0],2)
   return (poc, poc_vol)
 
+def find_poc_range(vol_prof_df, poc):
+  arr = []
+  for index, vol in vol_prof_df.iterrows():
+    arr.append(index)
+  count = 0
+  result = []
+  for price in arr:
+    if price == poc:
+      if count >= 2:
+        result.append(arr[count - 2])
+        # result.append(arr[count - 1])
+      if count <= len(arr) - 3:
+        # result.append(arr[count + 1])
+        result.append(arr[count + 2])
+    count += 1
+  
+  return result
+
 def vp_chart(vol_prof_df, color):
   poc_tuple = find_poc(vol_prof_df)
   poc = poc_tuple[0]
   poc_vol = poc_tuple[1]
 
-  poc_html = '<h5 style="font-family:sans-serif; color:'+color+';">POC: ' + str("{:,.0f}".format(poc)) + ', Vol: ' + str("{:,.0f}".format(poc_vol)) + '</h5>'
+  poc_range = find_poc_range(vol_prof_df, poc)
+
+  str_poc_title = '<h5 style="font-family:sans-serif; color:'+color+';">POC: '
+  str_poc_vol = str("{:,.0f}".format(poc)) + ', Vol: ' + str("{:,.0f}".format(poc_vol))
+  str_poc_range = ', Range: ' +  str(poc_range) + '</h5>'
+  poc_html = str_poc_title + str_poc_vol + str_poc_range
   st.write(poc_html, unsafe_allow_html=True)
   # Note here vol_prof_df has index: Close, 1 column: Volume
   # st.bzar_chart(vol_prof_df)
@@ -149,7 +172,7 @@ def vp_chart(vol_prof_df, color):
 # Note here vol_prof_df has index: Close, 1 column: Volume
 vol_prof_df = vol_profile(ticker_df)
 # Plot chart
-vol_profile_basic_chart = vp_chart(vol_prof_df, 'orange')
+vol_profile_basic_chart = vp_chart(vol_prof_df, '#0b9e12')
 st.altair_chart(vol_profile_basic_chart, use_container_width=True)
 # 2. Adjusted Volume Profile Chart
 adjusted_vol_profile = vol_profile_adj(vol_prof_df)
