@@ -262,17 +262,20 @@ def calc_cpr(high, low, close):
   
   cpr = {
     'Range': [str("{:,.2f}".format(abs(tc-bc)))],
-    'Top': [str("{:,.2f}".format(tc))],
+    'Top': [round(tc, 2)],
     # 'Middle PP': [str("{:,.2f}".format(pp))],
-    'Bottom': [str("{:,.2f}".format(bc))]
+    'Bottom': [round(bc, 2)]
   }
   return cpr
 
 cpr_dict = calc_cpr(ticker_high, ticker_low, ticker_close)
 cpr_df = pd.DataFrame(cpr_dict)
+cpr_top = cpr_dict['Top'][0]
+cpr_predict_top = str(cpr_top + 5)
+cpr_predict_bottom = str(cpr_top - 5)
 
 # Display dataframe table
-st.markdown('##### Central Pivot Range (CPR)')
+st.markdown('##### Central Pivot Range (CPR), Predict: [' + cpr_predict_top + ' ~ ' + cpr_predict_bottom + ']')
 st.table(cpr_df)
 # st.bar_chart(cpr_df)
 
