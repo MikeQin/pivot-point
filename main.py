@@ -271,8 +271,14 @@ def calc_cpr(high, low, close):
 cpr_dict = calc_cpr(ticker_high, ticker_low, ticker_close)
 cpr_df = pd.DataFrame(cpr_dict)
 cpr_top = cpr_dict['Top'][0]
-cpr_predict_top = str(cpr_top + 5)
-cpr_predict_bottom = str(cpr_top - 5)
+cpr_predict_top = ''
+cpr_predict_bottom = ''
+if ticker_close > cpr_top:
+  cpr_predict_top = str(cpr_top + 9)
+  cpr_predict_bottom = str(cpr_top + 2)
+else:
+  cpr_predict_top = str(cpr_top - 2)
+  cpr_predict_bottom = str(cpr_top - 9)  
 
 # Display dataframe table
 st.markdown('##### Central Pivot Range (CPR), Predict: [' + cpr_predict_top + ' ~ ' + cpr_predict_bottom + ']')
