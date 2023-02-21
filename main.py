@@ -273,15 +273,20 @@ cpr_df = pd.DataFrame(cpr_dict)
 cpr_top = cpr_dict['Top'][0]
 cpr_predict_top = ''
 cpr_predict_bottom = ''
+cpr_predict = ''
 if ticker_close > cpr_top:
-  cpr_predict_top = str(cpr_top + 9)
-  cpr_predict_bottom = str(cpr_top + 2)
+  cpr_predict = cpr_top + 9
+  cpr_predict_top = cpr_predict + 3
+  cpr_predict_bottom = cpr_predict -3
+  
 else:
-  cpr_predict_top = str(cpr_top - 2)
-  cpr_predict_bottom = str(cpr_top - 9)  
+  cpr_predict = cpr_top - 9
+  cpr_predict_top = cpr_predict + 3
+  cpr_predict_bottom = cpr_predict -3
 
+cpr_predict_str = str(cpr_predict) + ': '+ str(cpr_predict_top) + '~' + str(cpr_predict_bottom)
 # Display dataframe table
-st.markdown('##### Central Pivot Range (CPR), Predict: [' + cpr_predict_top + ' ~ ' + cpr_predict_bottom + ']')
+st.markdown('##### Central Pivot Range (CPR), Predict: [' + cpr_predict_str +']')
 st.table(cpr_df)
 # st.bar_chart(cpr_df)
 
